@@ -1,1 +1,11 @@
-{}
+{
+  "name": "FactorioRts",
+  "version": "0.0.1",
+  "title": "FactorioRts",
+  "author": "Exabyte & Snoetje",
+  "contact": "",
+  "homepage": "",
+  "factorio_version": "0.16",
+  "description": "Adds an Rts element to factorio",
+  "dependencies": ["base >= 0.16.51"]
+}
