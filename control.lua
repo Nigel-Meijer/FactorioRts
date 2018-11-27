@@ -59,7 +59,7 @@ local function on_player_deconstructed_area(event)
 			end
 		end
 	else
-		--local init_pos = {x=(event.area.left_top.x + event.area.right_bottom.x) / 2, y=(event.area.left_top.y + event.area.right_bottom.y) / 2}
+		local init_pos = {x=(event.area.left_top.x + event.area.right_bottom.x) / 2, y=(event.area.left_top.y + event.area.right_bottom.y) / 2}
 		-- dont find entities filtered if area is 0 (not allowed)
 		local biters = {}
 		if not (event.area.left_top.x == event.area.right_bottom.x and event.area.left_top.y == event.area.right_bottom.y) then 
@@ -67,7 +67,7 @@ local function on_player_deconstructed_area(event)
 		end
 		
 		if #biters == 0 then return end
-		global.players[event.player_index].selectedGroup = game.surfaces[1].create_unit_group({position=event.area.left_top})
+		global.players[event.player_index].selectedGroup = game.surfaces[1].create_unit_group({position=init_pos})
 		
 		-- cache all groups selected biters were part of
 		local otherGroups = {}
