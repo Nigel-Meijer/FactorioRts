@@ -7,35 +7,26 @@
 #  History:         
 =============================================================================--]]
 
-
 local event = require 'utils.event'
-global.selectedEntities = global.selectedEntities or {}
-global.playerNameBackup = global.playerNameBackup or {}
-global.playerColorBackup = global.playerColorBackup or {}
-global.playerRtsMode = global.playerRtsMode or {}
 
 
 local function RtsModeEnable(player)
-	global.playerRtsMode[player.index] = true
+	global.players[player.index].isRtsMode = true
 end
 
 local function RtsModeDisable(player)
-	global.playerRtsMode[player.index] = false
+	global.players[player.index].isRtsMode = false
 end
 
 local function IsRtsModeEnabled(player)
-	if global.playerRtsMode[player.index] then
-		return true
-	else
-		return false
-	end
+	return global.players[player.index].isRtsMode
 end
 
 
 local function BackupPlayer(player)
 	-- Make a backup
-	global.playerNameBackup[player.index] = player.name
-	global.playerColorBackup[player.index] = player.color
+	global.players[player.index].nameBackup = player.name
+	global.players[player.index].colorBackup = player.color
 	
 	--Remove name and make player dot opaque
 	player.name = " "
@@ -43,47 +34,57 @@ local function BackupPlayer(player)
 end
 
 local function RestorePlayer(player)
-	player.name = global.playerNameBackup[player.index]
-	player.color = global.playerColorBackup[player.index]
+	player.name = global.players[player.index].nameBackup
+	player.color = global.players[player.index].nameBackup
 end
 
 local function on_player_deconstructed_area(event)
-	if not IsRtsModeEnabled(game.players[event.player_index]) then return end
+	if not global.players[event.player_index].isRtsMode then return end
 	
 	if event.alt then
-		if global.selectedEntities[event.player_index] ~= nil and #global.selectedEntities[event.player_index].members > 0 then
+		if global.players[event.player_index].selectedGroup ~= nil and #global.players[event.player_index].selectedGroup.members > 0 then
 			-- b_command = defines.command.attack_area
 			-- b_distraction = defines.distraction.by_damage
 		
-			-- global.selectedEntities[event.player_index].set_command({type=b_command, destination=event.area.left_top, distraction=b_distraction, radius=1})
-			local members = global.selectedEntities[event.player_index].members
-			global.selectedEntities[event.player_index].destroy()
-			global.selectedEntities[event.player_index] = game.surfaces[1].create_unit_group({position=event.area.left_top})
+			-- global.selectedGroup[event.player_index].set_command({type=b_command, destination=event.area.left_top, distraction=b_distraction, radius=1})
+			
+			-- cache all members of old group
+			local members = global.players[event.player_index].selectedGroup.members
+			
+			-- remove old group and create a new one at target position
+			global.players[event.player_index].selectedGroup.destroy()
+			global.players[event.player_index].selectedGroup = game.surfaces[1].create_unit_group({position=event.area.left_top})
 			for _, biter in pairs(members) do
-				global.selectedEntities[event.player_index].add_member(biter)
+				global.players[event.player_index].selectedGroup.add_member(biter)
 			end
 		end
 	else
 		--local init_pos = {x=(event.area.left_top.x + event.area.right_bottom.x) / 2, y=(event.area.left_top.y + event.area.right_bottom.y) / 2}
-		local biters = game.surfaces[1].find_entities_filtered{area = event.area, type= "unit"}
-		if #biters == 0 then return end
-		global.selectedEntities[event.player_index] = game.surfaces[1].create_unit_group({position=event.area.left_top})
+		-- dont find entities filtered if area is 0 (not allowed)
+		local biters = {}
+		if not (event.area.left_top.x == event.area.right_bottom.x and event.area.left_top.y == event.area.right_bottom.y) then 
+			biters = game.surfaces[1].find_entities_filtered{area = event.area, type= "unit"}
+		end
 		
+		if #biters == 0 then return end
+		global.players[event.player_index].selectedGroup = game.surfaces[1].create_unit_group({position=event.area.left_top})
+		
+		-- cache all groups selected biters were part of
 		local otherGroups = {}
 		for _, biter in pairs(biters) do
 			if biter.unit_group then otherGroups[biter.unit_group] = true end
-			global.selectedEntities[event.player_index].add_member(biter)
+			global.players[event.player_index].selectedGroup.add_member(biter)
 		end
 		
 		-- remove empty groups created by merging
 		for group, _ in pairs(otherGroups) do
-			if not (group == global.selectedEntities[event.player_index]) then
+			if not (group == global.players[event.player_index].selectedGroup) then
 				game.print("group with " .. #group.members .. " members")
 				if #group.members == 0 then group.destroy() end
 			end
 		end
 		
-		game.print("Selected: " .. #global.selectedEntities[event.player_index].members)
+		game.print("Selected: " .. #global.players[event.player_index].selectedGroup.members)
 	end
 end
 
@@ -101,7 +102,17 @@ local function Create_RtsButton(player)
 end
 
 local function OnPlayerCreated(event)
+	
+	-- init tables
+	global.players = global.players or {}
+	
+	global.players[event.player_index] = {}
 
+	global.players[event.player_index].selectedGroup	= nil
+	global.players[event.player_index].nameBackup 		= ""
+	global.players[event.player_index].colorBackup 		= nil
+	global.players[event.player_index].isRtsMode 			= false
+	
 	local player = game.players[event.player_index]	
 	Create_RtsButton(player)
 	
@@ -111,7 +122,7 @@ local function OnPlayerCreated(event)
 end
 
 local function on_marked_for_deconstruction(event)
-	if not IsRtsModeEnabled(game.players[event.player_index]) then return end
+	if not global.players[event.player_index].isRtsMode then return end
 	
 	-- We are only doing this for the area selection so cancel the deconstruction.
 	event.entity.cancel_deconstruction(game.players[event.player_index].force.name)
