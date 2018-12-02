@@ -134,6 +134,28 @@ local function on_player_deconstructed_area(event)
 	end
 end
 
+local function selectSquadNum(player, number)
+	local i = 1
+	for squad, isInSet in pairs(global.players[player.index].squads) do
+
+		if not isInSet then goto continue end
+		if (not squad.valid) then 
+			global.players[player.index].squads[squad] = nil 
+			goto continue
+		end
+		if #squad.members == 0 then goto continue end
+		
+		if i == number then
+			global.players[player.index].selectedSquad = squad
+			gui.Update_Gui(player, "squadGui")
+			return
+		end
+		
+		i = i + 1
+		::continue::
+	end
+end
+
 local function OnPlayerCreated(event)
 	
 	-- init tables
@@ -222,6 +244,28 @@ local function on_gui_click(event)
 	end
 end
 
+local function on_player_cursor_stack_changed(event) 
+	game.print("event cursor stack changed fired")
+
+	local player = game.players[event.player_index]
+	if IsRtsModeEnabled(player) then
+		local cursorStack = player.cursor_stack
+		if cursorStack and cursorStack.is_deconstruction_item then
+			game.print("item is decon item")
+			local filters = cursorStack.entity_filters
+			for i = 1, #filters do
+				-- if not a valid squad planner, return
+				game.print("filter[" .. i .. "] =  " .. filters[i])
+
+				if filters[i] ~= "fish" then return end
+			end
+			game.print("found " .. #filters .. " fish")
+			-- its a valid squad planner
+			selectSquadNum(player, #filters)
+		end
+	end
+end
+
 local function on_tick(event)
 	if global.players[1].isRtsMode then
 		if event.tick % 60 == 0 then
@@ -242,5 +286,5 @@ event.add(defines.events.on_player_deconstructed_area, on_player_deconstructed_a
 event.add(defines.events.on_player_created, OnPlayerCreated)
 event.add(defines.events.on_gui_click, on_gui_click)
 
-
+event.add(defines.events.on_player_cursor_stack_changed, on_player_cursor_stack_changed)
 event.add(defines.events.on_tick, on_tick)
