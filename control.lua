@@ -202,7 +202,17 @@ local function on_gui_click(event)
 
 			-- Destroy the players character and give him a rts tool
 			player.character.destroy()
-			player.insert{name="deconstruction-planner", count = 1}
+				-- Fill inventory with Deconstruction planners
+				local quickbar = player.get_quickbar()
+				for i = 1,10,1 
+				do 
+					quickbar.set_filter(i,"deconstruction-planner")
+					player.insert{name="deconstruction-planner", count = 1}
+					for x = 1,i,1 
+					do
+						quickbar[i].set_entity_filter(x,"fish")
+					end
+				end
 			
 			-- Backup username and color and make name blank
 			BackupPlayer(player)
