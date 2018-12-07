@@ -106,7 +106,9 @@ local function on_player_deconstructed_area(event)
 		end
 		
 		if #biters == 0 then return end
-		global.players[event.player_index].selectedSquad = game.surfaces[1].create_unit_group({ position=init_pos })
+		-- find a suitable non spawner-colliding position for the unit group to form
+		local non_col_pos = game.surfaces[1].find_non_colliding_position("rocket-silo", init_pos, 0, 1)
+		global.players[event.player_index].selectedSquad = game.surfaces[1].create_unit_group({ position=non_col_pos })
 		-- add this squad to player's squads list
 		global.players[event.player_index].squads[ global.players[event.player_index].selectedSquad ] = true
 		gui.Update_Gui(game.players[ event.player_index ], "squadGui")
