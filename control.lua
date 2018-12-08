@@ -23,7 +23,6 @@ local function IsRtsModeEnabled(player)
 	return global.players[player.index].isRtsMode
 end
 
-
 local function BackupPlayer(player)
 	-- Make a backup
 	global.players[player.index].nameBackup = player.name
@@ -38,7 +37,6 @@ local function RestorePlayer(player)
 	player.name = global.players[player.index].nameBackup
 	player.color = global.players[player.index].nameBackup
 end
-
 
 local function SquadAttack()
 	if global.players[player_index].selectedSquad ~= nil and #global.players[player_index].selectedSquad.members > 0 then
@@ -70,7 +68,6 @@ local function SquadMove(area,player_index)
 	end
 end
 
-
 local function SquadSelect(area,player_index)
 	local init_pos = {x=(area.left_top.x + area.right_bottom.x) / 2, y=(area.left_top.y + area.right_bottom.y) / 2}
 		
@@ -80,26 +77,6 @@ local function SquadSelect(area,player_index)
 	if not (area.left_top.x == area.right_bottom.x and area.left_top.y == area.right_bottom.y) then 
 		-- area select: form new group
 		biters = game.surfaces[1].find_entities_filtered{area = area, type= "unit"}
-	else
-		--[[ TODO -- Repurpose this code
-		-- click select: find nearest group in range
-		local nearestGroup = nil
-		local leastDist = 10 -- also used as max distance from click to unit group center
-		for squad, isInSet in pairs(global.players[event.player_index].squads) do
-			if not isInSet then goto continue end
-			if (not squad.valid) or #squad.members == 0 then 
-				global.players[event.player_index].squads[squad] = nil 
-				goto continue 
-			end
-			
-			local dist = math.sqrt((event.area.left_top.x - squad.position.x)^2 + (event.area.left_top.y - squad.position.y)^2)
-			if dist < leastDist then nearestGroup = squad end
-			::continue::
-		end
-		
-		global.players[event.player_index].selectedSquad = nearestGroup
-		return
-		]]--
 	end
 	
 	if #biters == 0 then return end
@@ -109,7 +86,6 @@ local function SquadSelect(area,player_index)
 	-- add this squad to player's squads list
 	global.players[player_index].squads[global.players[player_index].selectedSquad] = true
 	gui.Update_Gui(game.players[player_index], "squadGui")
-	
 	
 	-- cache all groups selected biters were part of
 	local otherGroups = {}
@@ -133,13 +109,24 @@ local function SquadSelect(area,player_index)
 
 end
 
-
-
-
-
-
-
-
+local function SquadSelectNearest(area, player_index)
+	local nearestGroup = nil
+	local leastDist = 10 -- also used as max distance from click to unit group center
+	game.print(#global.players[player_index].squads)
+	for squad, isInSet in pairs(global.players[player_index].squads) do
+		if not isInSet then goto continue end
+		if (not squad.valid) or #squad.members == 0 then 
+			global.players[player_index].squads[squad] = nil 
+			goto continue 
+		end
+		
+		local dist = math.sqrt((area.left_top.x - squad.position.x)^2 + (area.left_top.y - squad.position.y)^2)
+		if dist < leastDist then nearestGroup = squad end
+		::continue::
+	end
+	
+	global.players[player_index].selectedSquad = nearestGroup
+end
 
 local function on_player_deconstructed_area(event)
 	if not global.players[event.player_index].isRtsMode then return end
