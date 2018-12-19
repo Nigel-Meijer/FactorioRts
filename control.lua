@@ -35,7 +35,7 @@ end
 
 local function RestorePlayer(player)
 	player.name = global.players[player.index].nameBackup
-	player.color = global.players[player.index].nameBackup
+	player.color = global.players[player.index].colorBackup
 end
 
 local function SquadAttack()
