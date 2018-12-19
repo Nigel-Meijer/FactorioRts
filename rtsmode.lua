@@ -31,9 +31,7 @@ local function RestorePlayer(player)
 end
 
 local function GiveSquadSelectTools(player_index)
-    game.print("test")
     local quickbar = game.players[player_index].get_quickbar()
-    game.print("test2")
     for i = 1,10,1 
     do 
         quickbar.set_filter(i,"deconstruction-planner")

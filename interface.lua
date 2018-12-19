@@ -17,6 +17,12 @@ local function OnPlayerCreated(event)
 end
 
 -- Function to handle single click input.
+
+local function LeftClickSingleWithShift(player_index,area)
+    squad.SelectNearest(player_index, area)
+    if DEBUG_INTERFACE_COMMANDS then game.players[player_index].print("Select Nearest") end
+end
+
 local function LeftClickSingle(player_index)
     local area = global.players[player_index].interface.lastLeftClickArea
     local areasize = (area.left_top.x - area.right_bottom.x) * (area.left_top.y - area.right_bottom.y)
@@ -25,10 +31,8 @@ local function LeftClickSingle(player_index)
         if squad.IsSquadSelected(player_index) then
             squad.Move(player_index, area)
             if DEBUG_INTERFACE_COMMANDS then game.players[player_index].print("Move") end
-        else
-            squad.SelectNearest(player_index, area)
-            if DEBUG_INTERFACE_COMMANDS then game.players[player_index].print("Select Nearest") end
         end
+
 
     else
         squad.SelectInArea(player_index, area)
@@ -75,7 +79,15 @@ local function OnTickInterfaceHandler(event)
 end
 
 local function on_player_deconstructed_area(event)
-	if not global.players[event.player_index].isRtsMode then return end
+    if not global.players[event.player_index].isRtsMode then return end
+    
+    if event.alt then
+        LeftClickSingleWithShift(event.player_index, event.area)
+
+        -- make sure this is reset incase of -> left click, left click shift.
+        global.players[event.player_index].interface.lastLeftClickOnTick = 0
+        return
+    end
 
     local timeSinceLastClick = game.tick - global.players[event.player_index].interface.lastLeftClickOnTick
     
