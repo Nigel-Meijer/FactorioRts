@@ -1,6 +1,7 @@
 local Gui = {}
 
 function Gui.Create_Gui(player, guiName)
+	--[[
 	if guiName == "upgradeGui" then
 		local upgradeGui = player.gui.top.rtsGui.add{ name = "upgradeGui", type = "frame", caption = "Upgrades", direction = "vertical" }
 		local upgradesTable = upgradeGui.add{ name = "upgradesTable", type = "table", column_count = 2 }
@@ -48,9 +49,11 @@ function Gui.Create_Gui(player, guiName)
 			::continue::
 		end
 	end
+	]]
 end
 
 function Gui.Update_Gui(player, guiName)
+	--[[
 	if not player.gui.top.rtsGui[guiName] then return false end
 	
 	if guiName == "upgradeGui" then
@@ -64,9 +67,11 @@ function Gui.Update_Gui(player, guiName)
 		Gui.Create_Gui(player, guiName)
 		
 	end
+	]]
 end
 
 function Gui.Update_SquadGui_Tick(player)
+	--[[
 	local i = 0
 	for squad, isInSet in pairs(global.players[player.index].squads) do
 		if not isInSet then goto continue end
@@ -92,6 +97,7 @@ function Gui.Update_SquadGui_Tick(player)
 		i = i + 1
 		::continue::
 	end
+	]]
 end
 
 function Gui.Toggle_Gui(player, guiName)

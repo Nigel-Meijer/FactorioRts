@@ -28,7 +28,7 @@ local function LeftClickSingle(player_index)
     local areasize = (area.left_top.x - area.right_bottom.x) * (area.left_top.y - area.right_bottom.y)
 
     if(areasize < AREASIZE_FOR_MOVE) then
-        if squad.IsSquadSelected(player_index) then
+        if squad.SquadSelected(player_index) then
             squad.Move(player_index, area)
             if DEBUG_INTERFACE_COMMANDS then game.players[player_index].print("Move") end
         end
@@ -42,7 +42,7 @@ end
 
 --Function to handle double click input
 local function LeftClickDouble(player_index,area)
-    if squad.IsSquadSelected(player_index) then
+    if squad.SquadSelected(player_index) then
         squad.Attack(player_index, area)
         if DEBUG_INTERFACE_COMMANDS then game.players[player_index].print("Attack") end
     end
