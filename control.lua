@@ -15,7 +15,7 @@ require 'interface'
 
 local function OnPlayerCreated(event)
 	-- init tables
-	global.players[event.player_index].selectedSquad	= nil
+	global.players[event.player_index].selectedSquadID	= nil
 	global.players[event.player_index].nameBackup 		= ""
 	global.players[event.player_index].colorBackup 		= nil
 	global.players[event.player_index].isRtsMode 			= false
@@ -70,7 +70,7 @@ local function on_gui_click(event)
 			::continue::
 		end
 		game.players[event.player_index].teleport(foundSquad.position)
-		global.players[player.index].selectedSquad = foundSquad
+		global.players[player.index].selectedSquadID = foundSquad
 	end
 end
 

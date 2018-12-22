@@ -16,13 +16,13 @@ function Squad.Attack(player_index, area)
 	if Squad.SquadSelected(player_index) == false then return end
 
 	-- Get squad using the selectedSquadID.
-	game.print("SelectedSquad = " .. global.players[player_index].selectedSquad) 
-	local squad = squadManager.GetSquad(global.players[player_index].selectedSquad)
+	game.print("SelectedSquad = " .. global.players[player_index].selectedSquadID) 
+	local squad = squadManager.GetSquad(global.players[player_index].selectedSquadID)
 
 	-- if there is no squad using that id exit
 	if squad == nil then
 		-- clear selected squad
-		global.players[player_index].selectedSquad = nil
+		global.players[player_index].selectedSquadID = nil
 		 return 
 	end
 
@@ -45,13 +45,13 @@ function Squad.Move(player_index, area)
 	if Squad.SquadSelected(player_index) == false then return end
 
 	-- Get squad using the selectedSquadID.
-	--game.print("SelectedSquad = " .. global.players[player_index].selectedSquad) 
-	local squad = squadManager.GetSquad(global.players[player_index].selectedSquad)
+	--game.print("SelectedSquad = " .. global.players[player_index].selectedSquadID) 
+	local squad = squadManager.GetSquad(global.players[player_index].selectedSquadID)
 
 	-- if there is no squad using that id exit
 	if squad == nil then
 		-- clear selected squad
-		global.players[player_index].selectedSquad = nil
+		global.players[player_index].selectedSquadID = nil
 		 return 
 	end
 
@@ -86,7 +86,7 @@ function Squad.SelectInArea(player_index, area)
 
 	local newSquad = game.surfaces[1].create_unit_group({ position=non_col_pos })
 	local squadID = squadManager.Add(newSquad)
-	global.players[player_index].selectedSquad = squadID
+	global.players[player_index].selectedSquadID = squadID
 
 	-- add squadID to player's squads list
 	table.insert(global.players[player_index].squads, squadID)
@@ -131,7 +131,7 @@ function Squad.SelectNearest(player_index, area)
 		::continue::
 	end
 	
-	global.players[player_index].selectedSquad = squadManager.FindSquadID(nearestGroup)
+	global.players[player_index].selectedSquadID = squadManager.FindSquadID(nearestGroup)
 	
 end
 
@@ -148,7 +148,7 @@ function Squad.SelectSquadNumber(player, hotkey)
 		if #squad.members == 0 then goto continue end
 		
 		if i == hotkey then
-			global.players[player.index].selectedSquad = squadID
+			global.players[player.index].selectedSquadID = squadID
 			gui.Update_Gui(player, "squadGui")
 			return
 		end
@@ -159,7 +159,7 @@ function Squad.SelectSquadNumber(player, hotkey)
 end
 
 function Squad.SquadSelected(player_index)
-    if global.players[player_index].selectedSquad ~= nil then
+    if global.players[player_index].selectedSquadID ~= nil then
         return true
     end
 

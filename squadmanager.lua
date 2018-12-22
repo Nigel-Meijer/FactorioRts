@@ -100,9 +100,9 @@ function SquadManager.RemoveSquadFromPlayers(squadID)
             global.players[player.index].squads[squadID] = nil
         end
 
-        -- remove from selectedsquad
-        if global.players[player.index].selectedSquad == squadID then
-            global.players[player.index].selectedSquad = nil
+        -- remove from selectedsquadID
+        if global.players[player.index].selectedSquadID == squadID then
+            global.players[player.index].selectedSquadID = nil
         end
     end
 end
