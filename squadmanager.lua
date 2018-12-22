@@ -39,7 +39,8 @@ function SquadManager.Delete(squadID)
             SquadManager.GetSquad(squadID).destroy()
         end
 
-        --TODO Remove from players squad list. ?
+        -- Remove deleted squad from players squadlist / selected
+        SquadManager.RemoveSquadFromPlayers(squadID)
 
         -- Delete the group from the table.
         global.squadManager.squads[squadID] = nil
@@ -81,10 +82,6 @@ function SquadManager.GetSquad(squadID)
     return nil
 end
 
-function SquadManager.ResetSquads()
-	-- Empty the squad lists
-end
-
 function SquadManager.CountSquads()
     local count = 0
     for _, _ in pairs(global.squadManager.squads) do 
@@ -94,22 +91,21 @@ function SquadManager.CountSquads()
     return count
 end
 
+-- Remove the selected squadID from player squads and selected squad.
+function SquadManager.RemoveSquadFromPlayers(squadID)
+    for _, player in pairs(game.players) do
+        -- Remove from squads
 
---[[
-    	local start = global.squadManager.nextUniqueSquadID
-	for i = 1, 100000, 1 do
-		global.squadManager.squads[global.squadManager.nextUniqueSquadID] = global.squadManager.nextUniqueSquadID
-		global.squadManager.nextUniqueSquadID = global.squadManager.nextUniqueSquadID + 1
-	end
+        if global.players[player.index].squads[squadID] ~= nil then
+            global.players[player.index].squads[squadID] = nil
+        end
 
-	for i = 1, 100000, 1 do
-		global.squadManager.squads[start] = nil
-		start = start + 1
-	end
-
-	
-	game.print(global.squadManager.nextUniqueSquadID)
---]]
+        -- remove from selectedsquad
+        if global.players[player.index].selectedSquad == squadID then
+            global.players[player.index].selectedSquad = nil
+        end
+    end
+end
 
 local function on_tick(event)
     -- "==25" to spread load
