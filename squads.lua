@@ -130,9 +130,11 @@ function Squad.SelectNearest(player_index, area)
 		if dist < leastDist then nearestGroup = squad end
 		::continue::
 	end
-	
-	global.players[player_index].selectedSquadID = squadManager.FindSquadID(nearestGroup)
-	
+	if nearestGroup ~= nil then
+		global.players[player_index].selectedSquadID = squadManager.FindSquadID(nearestGroup)
+	else
+		global.players[player_index].selectedSquadID = nil
+	end
 end
 
 function Squad.SelectSquadNumber(player, hotkey)

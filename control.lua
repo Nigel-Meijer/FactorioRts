@@ -15,7 +15,7 @@ require 'interface'
 
 local function OnPlayerCreated(event)
 	-- init tables
-	global.players[event.player_index].selectedSquadID	= nil
+	global.players[event.player_index].selectedSquadID	= nil -- nil means nothing selected.
 	global.players[event.player_index].nameBackup 		= ""
 	global.players[event.player_index].colorBackup 		= nil
 	global.players[event.player_index].isRtsMode 			= false

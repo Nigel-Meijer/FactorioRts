@@ -62,6 +62,8 @@ end
 
 -- Searches for the group index in the table.
 function SquadManager.FindSquadID(unitGroup)
+    if unitGroup == nil then return nil end
+    
     for squadID, squad in pairs(global.squadManager.squads) do 
         if squad == unitGroup then
             return squadID
@@ -69,7 +71,7 @@ function SquadManager.FindSquadID(unitGroup)
     end
 
     -- if no squad found return 0
-    return 0
+    return nil
 end
 
 function SquadManager.GetSquad(squadID)
