@@ -47,7 +47,7 @@ function SquadManager.Delete(squadID)
 end
 
 -- used to garbage collect the killed squads.
-function SquadManager.GarbageCollect()
+function SquadManager.GarbageCollect() -- TODO add an on tick handler and run every uhh half a second or second ?
     for squadID, squad in pairs(global.squadManager.squads) do 
         if squad.valid == false then
             game.print("Squad: " .. squadID .. " was killed in action.")
