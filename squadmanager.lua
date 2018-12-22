@@ -113,7 +113,7 @@ end
 
 local function on_tick(event)
     -- "==25" to spread load
-    if event.tick % 60 == 25 then
+    if (event.tick % 60) == 25 then
         SquadManager.GarbageCollect()
     end
 end
