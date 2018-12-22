@@ -11,6 +11,7 @@ require 'config' -- should always be the first require!
 require 'rtsmode'
 local event = require 'utils.event'
 local gui = require 'gui'
+local squadManager = require 'squadmanager'
 require 'interface'
 
 local function OnPlayerCreated(event)
@@ -52,25 +53,25 @@ local function on_gui_click(event)
 	
 	
 	elseif string.find(name, "^squad_previewButton") then
+		game.print("button clicked")
 		local squadNum = tonumber(string.sub(name, -1))
 		local foundSquad = nil
+		local foundSquadID = nil
 		local i = 0
 		
-		for squad, isInSet in pairs(global.players[player.index].squads) do
-			if not isInSet then goto continue end
-			if (not squad.valid) then 
-				global.players[player.index].squads[squad] = nil 
-				goto continue
+		for _, squadID in pairs(global.players[player.index].squads) do
+			local squad = squadManager.GetSquad(squadID)
+			if squad ~= nil then
+				if i == squadNum then 
+					foundSquad = squad
+					foundSquadID = squadID
+					break
+				end
+				i = i + 1
 			end
-			if i == squadNum then 
-				foundSquad = squad
-				break
-			end
-			i = i + 1
-			::continue::
 		end
 		game.players[event.player_index].teleport(foundSquad.position)
-		global.players[player.index].selectedSquadID = foundSquad
+		global.players[player.index].selectedSquadID = foundSquadID
 	end
 end
 
@@ -79,7 +80,7 @@ local function on_tick(event)
 		if event.tick % 60 == 0 then
 			gui.Update_Gui(game.players[1], "squadGui")
 		end
-		if event.tick % 1 == 0 then
+		if event.tick % 5 == 0 then
 			for _, player in pairs(game.players) do
 				if global.players[player.index].isRtsMode then
 					gui.Update_SquadGui_Tick(player)
