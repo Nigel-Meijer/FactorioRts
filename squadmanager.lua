@@ -47,11 +47,13 @@ function SquadManager.Delete(squadID)
 end
 
 -- used to garbage collect the killed squads.
-function SquadManager.GarbageCollect() -- TODO add an on tick handler and run every uhh half a second or second ?
+function SquadManager.GarbageCollect()
     for squadID, squad in pairs(global.squadManager.squads) do 
         if squad.valid == false then
-            game.print("Squad: " .. squadID .. " was killed in action.")
+
             -- NOTE: Could create a custom event to notice player that squad died.
+            game.print("Squad: " .. squadID .. " was killed in action.")
+
             SquadManager.Delete(squadID)
         end
     end
@@ -90,7 +92,6 @@ function SquadManager.CountSquads()
     end
 
     return count
-	-- Empty the squad lists
 end
 
 
@@ -110,6 +111,15 @@ end
 	game.print(global.squadManager.nextUniqueSquadID)
 --]]
 
+local function on_tick(event)
+    -- "==25" to spread load
+    if event.tick % 60 == 25 then
+        SquadManager.GarbageCollect()
+    end
+end
+
+
+event.add(defines.events.on_tick, on_tick)
 event.add(defines.events.on_player_created, OnPlayerCreated)
 
 
